@@ -337,7 +337,7 @@ function calculateResult(playerScore, botScore) {
   const {
     score: score_p,
     trio: trio_p,
-    pureSequence: pureSequenceOfAce_p,
+    pureSequenceOfAce: pureSequenceOfAce_p,
     pureSequence: pureSequence_p,
     normalSequence: normalSequence_p,
     colore: colore_p,
@@ -349,7 +349,7 @@ function calculateResult(playerScore, botScore) {
   const {
     score: score_b,
     trio: trio_b,
-    pureSequence: pureSequenceOfAce_b,
+    pureSequenceOfAce: pureSequenceOfAce_b,
     pureSequence: pureSequence_b,
     normalSequence: normalSequence_b,
     colore: colore_b,
@@ -386,6 +386,25 @@ function calculateResult(playerScore, botScore) {
     }
     return winner;
   }
+
+  //pure sequence
+  else if (pureSequence_p || pureSequence_b){
+    if (pureSequence_p && !pureSequence_b) {
+      winner = { name: "You won", msg: "pure sequence" };
+    } else if (!pureSequence_p && pureSequence_b) {
+      winner = { name: "Bot won", msg: "pure sequence" };
+    } else {
+      if (score_p > score_b) {
+        winner = { name: "You won", msg: "pure sequence" };
+      } else if (score_p < score_b) {
+        winner = { name: "Bot won", msg: "pure sequence" };
+      } else {
+        winner = { name: "it's a Draw", msg: "pure sequence" };
+      }
+    }
+    return winner;
+  }
+
   //normal sequence
   else if (normalSequence_p || normalSequence_b) {
     if (normalSequence_p && !normalSequence_b) {
