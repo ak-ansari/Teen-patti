@@ -20,6 +20,10 @@ const calculatingDom = document.querySelector(".calc");
 const resultImgs = document.querySelector(".resultImgs");
 let pressed = false;
 let isShowResult = false;
+const cardRenderSound=new Audio('../assets/sounds/swish.m4a');
+const winSound=new Audio('../assets/sounds/winSound.mp3')
+const loseSound=new Audio('../assets/sounds/loseSound.mp3')
+const drawSound=new Audio('../assets/sounds/drawSound.mp3')
 
 //variables
 
@@ -63,12 +67,12 @@ show_result.addEventListener("click", async () => {
     await sleep(500);
     calculatingDom.classList.remove("d-none");
     deck.classList.add("load");
-    showResult(result);
-    await sleep(2000);
+    await sleep(1500);
     calculatingDom.classList.add("d-none");
     deck.classList.remove("load");
     main_wrapper.classList.add("d-none");
     // showResult(result);
+    showResult(result);
     resultDom.classList.remove("d-none");
   }
 });
@@ -112,23 +116,27 @@ let sleep = (ms) => {
 
 function showResult(result) {
   const { name, msg } = result;
-  winnerName.innerHTML = name;
-  setName.innerHTML = msg;
+ 
   if (name === "You won") {
     youwon++;
     YOU.innerHTML = youwon;
-    forloop(playerCardSet,resultImgs)
+    forloop(playerCardSet,resultImgs);
+    winSound.play();
   } else if (name === "Bot won") {
     botwon++;
     BOT.innerHTML = botwon;
     forloop(botCardSet, resultImgs);
+    loseSound.play()
   } else {
     draw++;
     DRAW.innerHTML = draw;
     forloop(playerCardSet,resultImgs)
     resultImgs.innerHTML += `<h4>Cards are equivalent</h4>`;
     forloop(botCardSet,resultImgs)
+    drawSound.play()
   }
+   winnerName.innerHTML = name;
+   setName.innerHTML = msg;
 }
 
 //render cards
@@ -140,8 +148,9 @@ async function renderCards(arr, dom, ms) {
     const htmlMarkup = `
     
     <img src="./assets/CARDS/${src}" alt=""></img>`;
+    cardRenderSound.play()
+    await promiseWraper(()=>dom.innerHTML += htmlMarkup)
     await sleep(ms);
-    dom.innerHTML += htmlMarkup;
   }
 }
 function forloop(arr, dom) {
