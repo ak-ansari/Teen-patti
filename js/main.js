@@ -20,10 +20,10 @@ const calculatingDom = document.querySelector(".calc");
 const resultImgs = document.querySelector(".resultImgs");
 let pressed = false;
 let isShowResult = false;
-const cardRenderSound=new Audio('../assets/sounds/swish.m4a');
-const winSound=new Audio('../assets/sounds/winSound.mp3')
-const loseSound=new Audio('../assets/sounds/loseSound.mp3')
-const drawSound=new Audio('../assets/sounds/drawSound.mp3')
+const cardRenderSound = new Audio("../assets/sounds/swish.m4a");
+const winSound = new Audio("../assets/sounds/winSound.mp3");
+const loseSound = new Audio("../assets/sounds/loseSound.mp3");
+const drawSound = new Audio("../assets/sounds/drawSound.mp3");
 
 //variables
 
@@ -46,12 +46,12 @@ get_cards.addEventListener("click", async () => {
     array = await promiseWraper(() => CardArrayMaker());
     await promiseWraper(() => distribute(array));
     blind.classList.remove("d-none");
-    renderCards(playerCardSet,yourCard, 1000);
+    renderCards(playerCardSet, yourCard, 1000);
     renderCards(botCardSet, botsCard, 0);
     playerScore = await promiseWraper(() => setScore(playerCardSet));
     botScore = await promiseWraper(() => setScore(botCardSet));
     result = await promiseWraper(() => calculateResult(playerScore, botScore));
-    console.log({player:playerCardSet,bot:botCardSet})
+    console.log({ player: playerCardSet, bot: botCardSet });
   }
 });
 
@@ -71,38 +71,36 @@ show_result.addEventListener("click", async () => {
     calculatingDom.classList.add("d-none");
     deck.classList.remove("load");
     main_wrapper.classList.add("d-none");
-    // showResult(result);
+
     showResult(result);
     resultDom.classList.remove("d-none");
   }
 });
 
-//reset all 
+//reset all
 
 replay.addEventListener("click", async () => {
-  await promiseWraper(()=>{
+  await promiseWraper(() => {
     playerCardSet = [];
     botCardSet = [];
     playerScore = {};
     botScore = {};
     array = [];
     result = {};
-    yourCard.innerHTML='';
-    botsCard.innerHTML='';
-    winnerName.innerHTML='';
-    setName.innerHTML='';
-    resultImgs.innerHTML=''
+    yourCard.innerHTML = "";
+    botsCard.innerHTML = "";
+    winnerName.innerHTML = "";
+    setName.innerHTML = "";
+    resultImgs.innerHTML = "";
     pressed = false;
     isShowResult = false;
     botsCard.classList.add("d-none");
-
   });
-  resultDom.classList.add('d-none');
-  get_cards.classList.remove('d-none');
-  show_result.classList.remove('d-none');
-  replay.classList.add('d-none');
-  main_wrapper.classList.remove('d-none')
-  
+  resultDom.classList.add("d-none");
+  get_cards.classList.remove("d-none");
+  show_result.classList.remove("d-none");
+  replay.classList.add("d-none");
+  main_wrapper.classList.remove("d-none");
 });
 
 //sleep function
@@ -116,27 +114,27 @@ let sleep = (ms) => {
 
 function showResult(result) {
   const { name, msg } = result;
- 
+
   if (name === "You won") {
     youwon++;
     YOU.innerHTML = youwon;
-    forloop(playerCardSet,resultImgs);
+    forloop(playerCardSet, resultImgs);
     winSound.play();
   } else if (name === "Bot won") {
     botwon++;
     BOT.innerHTML = botwon;
     forloop(botCardSet, resultImgs);
-    loseSound.play()
+    loseSound.play();
   } else {
     draw++;
     DRAW.innerHTML = draw;
-    forloop(playerCardSet,resultImgs)
+    forloop(playerCardSet, resultImgs);
     resultImgs.innerHTML += `<h4>Cards are equivalent</h4>`;
-    forloop(botCardSet,resultImgs)
-    drawSound.play()
+    forloop(botCardSet, resultImgs);
+    drawSound.play();
   }
-   winnerName.innerHTML = name;
-   setName.innerHTML = msg;
+  winnerName.innerHTML = name;
+  setName.innerHTML = msg;
 }
 
 //render cards
@@ -148,8 +146,8 @@ async function renderCards(arr, dom, ms) {
     const htmlMarkup = `
     
     <img src="./assets/CARDS/${src}" alt=""></img>`;
-    cardRenderSound.play()
-    await promiseWraper(()=>dom.innerHTML += htmlMarkup)
+    cardRenderSound.play();
+    await promiseWraper(() => (dom.innerHTML += htmlMarkup));
     await sleep(ms);
   }
 }
@@ -388,7 +386,7 @@ function calculateResult(playerScore, botScore) {
   }
 
   //pure sequence
-  else if (pureSequence_p || pureSequence_b){
+  else if (pureSequence_p || pureSequence_b) {
     if (pureSequence_p && !pureSequence_b) {
       winner = { name: "You won", msg: "pure sequence" };
     } else if (!pureSequence_p && pureSequence_b) {
