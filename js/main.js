@@ -51,7 +51,7 @@ get_cards.addEventListener("click", async () => {
     playerScore = await promiseWraper(() => setScore(playerCardSet));
     botScore = await promiseWraper(() => setScore(botCardSet));
     result = await promiseWraper(() => calculateResult(playerScore, botScore));
-    console.log({ player: playerCardSet, bot: botCardSet });
+    ({ player: playerCardSet, bot: botCardSet });
   }
 });
 
@@ -478,5 +478,4 @@ function ifElseWrapper(cond_one, cond_Two, msg, playerScore, botScore) {
       }
     }
   }
-  console.log(win);
 }
