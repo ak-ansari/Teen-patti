@@ -112,67 +112,12 @@ let sleep = (ms) => {
   });
 };
 
-function showResult(result) {
-  const { name, msg } = result;
-
-  if (name === "You won") {
-    youwon++;
-    YOU.innerHTML = youwon;
-    forloop(playerCardSet, resultImgs);
-    winSound.play();
-  } else if (name === "Bot won") {
-    botwon++;
-    BOT.innerHTML = botwon;
-    forloop(botCardSet, resultImgs);
-    loseSound.play();
-  } else {
-    draw++;
-    DRAW.innerHTML = draw;
-    forloop(playerCardSet, resultImgs);
-    resultImgs.innerHTML += `<h4>Cards are equivalent</h4>`;
-    forloop(botCardSet, resultImgs);
-    drawSound.play();
-  }
-  winnerName.innerHTML = name;
-  setName.innerHTML = msg;
-}
-
-//render cards
-
-async function renderCards(arr, dom, ms) {
-  for (let card of arr) {
-    const { value, set } = card;
-    const src = `${value.toString() + set}.png`;
-    const htmlMarkup = `
-    
-    <img src="./assets/CARDS/${src}" alt=""></img>`;
-    cardRenderSound.play();
-    await promiseWraper(() => (dom.innerHTML += htmlMarkup));
-    await sleep(ms);
-  }
-}
-function forloop(arr, dom) {
-  for (let card of arr) {
-    const { value, set } = card;
-    const src = `${value.toString() + set}.png`;
-    const htmlMarkup = `
-    <img src="./assets/CARDS/${src}" alt=""></img>`;
-    dom.innerHTML += htmlMarkup;
-  }
-}
-
-//promise wraper function
-let promiseWraper = (work) => {
-  return new Promise((resolve, reject) => {
-    resolve(work());
-  });
-};
-
 //ramdom number
 function randomNumber(num) {
   let number = Math.floor(Math.random() * num);
   return number;
 }
+
 //selecting cards
 function CardArrayMaker() {
   let numberArray = [];
@@ -199,6 +144,61 @@ function distribute(arr) {
     botCardSet.push(arr[j]);
   }
 }
+function showResult(result) {
+  const { name, msg } = result;
+
+  if (name === "You won") {
+    youwon++;
+    YOU.innerHTML = youwon;
+    forloop(playerCardSet, resultImgs);
+    winSound.play();
+  } else if (name === "Bot won") {
+    botwon++;
+    BOT.innerHTML = botwon;
+    forloop(botCardSet, resultImgs);
+    loseSound.play();
+  } else {
+    draw++;
+    DRAW.innerHTML = draw;
+    forloop(playerCardSet, resultImgs);
+    resultImgs.innerHTML += `<h4>Cards are equivalent</h4>`;
+    forloop(botCardSet, resultImgs);
+    drawSound.play();
+  }
+  winnerName.innerHTML = name;
+  setName.innerHTML = msg;
+}
+//render cards
+
+async function renderCards(arr, dom, ms) {
+  for (let card of arr) {
+    const { value, set } = card;
+    const src = `${value.toString() + set}.png`;
+    const htmlMarkup = `
+    
+    <img src="./assets/CARDS/${src}" alt=""></img>`;
+    cardRenderSound.play();
+    await promiseWraper(() => (dom.innerHTML += htmlMarkup));
+    await sleep(ms);
+  }
+}
+
+function forloop(arr, dom) {
+  for (let card of arr) {
+    const { value, set } = card;
+    const src = `${value.toString() + set}.png`;
+    const htmlMarkup = `
+    <img src="./assets/CARDS/${src}" alt=""></img>`;
+    dom.innerHTML += htmlMarkup;
+  }
+}
+
+//promise wraper function
+let promiseWraper = (work) => {
+  return new Promise((resolve, reject) => {
+    resolve(work());
+  });
+};
 
 //checking for conditions and setting score
 function setScore(CardSet) {
@@ -259,6 +259,8 @@ function setScore(CardSet) {
   }
 
   //checking for sequence
+
+  //1. checking for ace 2 3
   let tempval1 = valueOne;
   let tempval2 = valueTwo;
   let tempval3 = valueThree;
@@ -300,21 +302,41 @@ function setScore(CardSet) {
     //check for pure seqence
     if (cardOne.set === cardTwo.set && cardTwo.set === cardThree.set) {
       if (tempsmallest === 1) {
-        scoreObject = { pureSequence: true, score: 14 };
+        scoreObject = { pureSequence: true, score: 14, second: 14, third: 14 };
       } else {
-        scoreObject = { pureSequence: true, score: templargest };
+        scoreObject = {
+          pureSequence: true,
+          score: templargest,
+          second: templargest,
+          third: templargest,
+        };
       }
       if (largest === 14 && middle === 13 && smallest === 12) {
         scoreObject = { pureSequenceOfAce: true };
       }
     } else {
       if (tempsmallest === 1) {
-        scoreObject = { normalSequence: true, score: 14 };
+        scoreObject = {
+          normalSequence: true,
+          score: 14,
+          second: 14,
+          third: 14,
+        };
       } else {
-        scoreObject = { normalSequence: true, score: templargest };
+        scoreObject = {
+          normalSequence: true,
+          score: templargest,
+          second: templargest,
+          third: templargest,
+        };
       }
       if (largest === 14 && middle === 13 && smallest === 12) {
-        scoreObject = { normalSequence: true, score: 15 };
+        scoreObject = {
+          normalSequence: true,
+          score: 15,
+          second: 15,
+          third: 15,
+        };
       }
     }
   }
@@ -322,7 +344,7 @@ function setScore(CardSet) {
   //checking for trio
   if (valueOne === valueTwo && valueTwo === valueThree) {
     let score = valueOne;
-    scoreObject = { score: score, trio: true };
+    scoreObject = { score: score, trio: true, second: score, third: score };
   }
 
   return scoreObject;
@@ -333,19 +355,6 @@ function setScore(CardSet) {
 function calculateResult(playerScore, botScore) {
   let winner = {};
   const {
-    score: score_p,
-    trio: trio_p,
-    pureSequenceOfAce: pureSequenceOfAce_p,
-    pureSequence: pureSequence_p,
-    normalSequence: normalSequence_p,
-    colore: colore_p,
-    duo: duo_p,
-    majorCard: majorCard_p,
-    second: second_p,
-    third: third_p,
-  } = playerScore;
-  const {
-    score: score_b,
     trio: trio_b,
     pureSequenceOfAce: pureSequenceOfAce_b,
     pureSequence: pureSequence_b,
@@ -353,154 +362,121 @@ function calculateResult(playerScore, botScore) {
     colore: colore_b,
     duo: duo_b,
     majorCard: majorCard_b,
-    second: second_b,
-    third: third_b,
   } = botScore;
+  const {
+    trio: trio_p,
+    pureSequenceOfAce: pureSequenceOfAce_p,
+    pureSequence: pureSequence_p,
+    normalSequence: normalSequence_p,
+    colore: colore_p,
+    duo: duo_p,
+    majorCard: majorCard_p,
+  } = playerScore;
 
   //trio
   if (trio_p || trio_b) {
-    if (trio_p && !trio_b) {
-      winner = { name: "You won", msg: "trio" };
-    } else if (!trio_p && trio_b) {
-      winner = { name: "Bot won", msg: "trio" };
-    } else {
-      if (score_p > score_b) {
-        winner = { name: "You won", msg: "trio" };
-      } else {
-        winner = { name: "Bot won", msg: "trio" };
-      }
-    }
+    winner = ifElseWrapper(trio_p, trio_b, "Trio", playerScore, botScore);
     return winner;
   }
 
   //pureSequence of ace
   else if (pureSequenceOfAce_p || pureSequenceOfAce_b) {
-    if (pureSequenceOfAce_p && !pureSequenceOfAce_b) {
-      winner = { name: "You won", msg: "pure sequence of ace" };
-    } else if (!pureSequenceOfAce_p && pureSequenceOfAce_b) {
-      winner = { name: "Bot won", msg: "pure sequence of ace" };
-    } else {
-      winner = { name: "it's a Draw", msg: "pure sequence of ace" };
-    }
+    winner = ifElseWrapper(
+      pureSequenceOfAce_p,
+      pureSequenceOfAce_b,
+      "Pure sequence of Ace",
+      playerScore,
+      botScore
+    );
     return winner;
   }
 
   //pure sequence
   else if (pureSequence_p || pureSequence_b) {
-    if (pureSequence_p && !pureSequence_b) {
-      winner = { name: "You won", msg: "pure sequence" };
-    } else if (!pureSequence_p && pureSequence_b) {
-      winner = { name: "Bot won", msg: "pure sequence" };
-    } else {
-      if (score_p > score_b) {
-        winner = { name: "You won", msg: "pure sequence" };
-      } else if (score_p < score_b) {
-        winner = { name: "Bot won", msg: "pure sequence" };
-      } else {
-        winner = { name: "it's a Draw", msg: "pure sequence" };
-      }
-    }
+    winner = ifElseWrapper(
+      pureSequence_p,
+      pureSequence_b,
+      "Pure sequence",
+      playerScore,
+      botScore
+    );
     return winner;
   }
 
   //normal sequence
   else if (normalSequence_p || normalSequence_b) {
-    if (normalSequence_p && !normalSequence_b) {
-      winner = { name: "You won", msg: "sequence" };
-    } else if (!normalSequence_p && normalSequence_b) {
-      winner = { name: "Bot won", msg: "sequence" };
-    } else {
-      if (score_p > score_b) {
-        winner = { name: "You won", msg: "sequence" };
-      } else if (score_p < score_b) {
-        winner = { name: "Bot won", msg: "sequence" };
-      } else {
-        winner = { name: "it's a Draw", msg: "sequence" };
-      }
-    }
+    winner = ifElseWrapper(
+      normalSequence_p,
+      normalSequence_b,
+      "Normal Sequence",
+      playerScore,
+      botScore
+    );
     return winner;
   }
 
   //color
   else if (colore_p || colore_b) {
-    if (colore_p && !colore_b) {
-      winner = { name: "You won", msg: "Color" };
-    } else if (!colore_p && colore_b) {
-      winner = { name: "Bot won", msg: "Color" };
-    } else {
-      if (score_p > score_b) {
-        winner = { name: "You won", msg: "Color" };
-      } else if (score_p < score_b) {
-        winner = { name: "Bot won", msg: "Color" };
-      } else {
-        if (second_p > second_p) {
-          winner = { name: "You won", msg: "Color" };
-        } else if (second_p < second_b) {
-          winner = { name: "Bot won", msg: "Color" };
-        } else {
-          if (third_p > third_p) {
-            winner = { name: "You won", msg: "Color" };
-          } else if (third_p < third_b) {
-            winner = { name: "Bot won", msg: "Color" };
-          } else {
-            winner = { name: "it's a Draw", msg: "Color" };
-          }
-        }
-      }
-    }
+    winner = ifElseWrapper(colore_p, colore_b, "Color", playerScore, botScore);
     return winner;
   }
 
   //duo
-  if (duo_p || duo_b) {
-    if (duo_p && !duo_b) {
-      winner = { name: "You won", msg: "Duo" };
-    } else if (!duo_p && duo_b) {
-      winner = { name: "Bot won", msg: "Duo" };
-    } else {
-      if (score_p > score_b) {
-        winner = { name: "You won", msg: "Duo" };
-      } else if (score_p < score_b) {
-        winner = { name: "Bot won", msg: "Duo" };
-      } else {
-        if (second_p > second_b) {
-          winner = { name: "You won", msg: "Duo" };
-        } else if (second_p < second_b) {
-          winner = { name: "Bot won", msg: "Duo" };
-        } else {
-          winner = { name: "it's a Draw", msg: "Duo" };
-        }
-      }
-    }
+  else if (duo_p || duo_b) {
+    winner = ifElseWrapper(duo_p, duo_b, "Duo", playerScore, botScore);
     return winner;
   }
   // major card
   else if (majorCard_p || majorCard_b) {
-    if (majorCard_p && !majorCard_b) {
-      winner = { name: "You won", msg: "major-card" };
-    } else if (!majorCard_p && majorCard_b) {
-      winner = { name: "Bot won", msg: "major-card" };
+    winner = ifElseWrapper(
+      majorCard_p,
+      majorCard_b,
+      "Major Card",
+      playerScore,
+      botScore
+    );
+    return winner;
+  }
+}
+
+function ifElseWrapper(cond_one, cond_Two, msg, playerScore, botScore) {
+  let win = {};
+  const { score: score_b, second: second_b, third: third_b } = botScore;
+  const { score: score_p, second: second_p, third: third_p } = playerScore;
+  let youWon = { name: "You won", msg: msg };
+  let botWon = { name: "Bot won", msg: msg };
+  if (cond_one && !cond_Two) {
+    win = youWon;
+    return win;
+  } else if (!cond_one && cond_Two) {
+    win = botWon;
+    return win;
+  } else {
+    if (score_p > score_b) {
+      win = youWon;
+      return win;
+    } else if (score_p < score_b) {
+      win = botWon;
+      return win;
     } else {
-      if (score_p > score_b) {
-        winner = { name: "You won", msg: "major-card" };
-      } else if (score_p < score_b) {
-        winner = { name: "Bot won", msg: "major-card" };
+      if (second_p > second_b) {
+        win = youWon;
+        return win;
+      } else if (second_p < second_b) {
+        win = botWon;
+        return win;
       } else {
-        if (second_p > second_b) {
-          winner = { name: "You won", msg: "major-card" };
-        } else if (second_p < second_b) {
-          winner = { name: "Bot won", msg: "major-card" };
+        if (third_p > third_b) {
+          win = youWon;
+        } else if (third_p < third_b) {
+          win = botWon;
+          return win;
         } else {
-          if (third_p > third_b) {
-            winner = { name: "You won", msg: "major-card" };
-          } else if (third_p < third_b) {
-            winner = { name: "Bot won", msg: "major-card" };
-          } else {
-            winner = { name: "it's a Draw", msg: "major-card" };
-          }
+          win = { name: "it's a Draw", msg: msg };
+          return win;
         }
       }
     }
-    return winner;
   }
+  console.log(win);
 }
